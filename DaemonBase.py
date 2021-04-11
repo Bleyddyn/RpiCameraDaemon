@@ -52,6 +52,11 @@ class DaemonBase(object):
             print("{0}: Log file = {1}".format(self.name, self.log_file))
 # TODO don't start if already running.
 # TODO Create any needed directories?
+        self._createDirectories( self.pid_file, isFile=True )
+        self._createDirectories( self.working_directory, isFile=False )
+        self._createDirectories( self.stdout_file, isFile=True )
+        self._createDirectories( self.stderr_file, isFile=True )
+        self._createDirectories( self.log_file, isFile=True )
         with daemon.DaemonContext(
             working_directory=self.working_directory,
             umask=0o002,
@@ -145,6 +150,13 @@ class DaemonBase(object):
             self.stderr_file = args.stderr_file
 
         args.func(args)
+
+    def _createDirectories( self, path, isFile=False ):
+        if isFile:
+            path = os.path.dirname(path)
+        if os.path.isdir(path):
+            return
+        os.makedirs(path)
 
 class TestDaemon(DaemonBase):
     def __init__(self, extra1, *args, extra2=None, **kwargs):

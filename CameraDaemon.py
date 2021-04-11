@@ -45,7 +45,10 @@ class RpiCameraDaemon(DaemonBase):
 
     def run(self):
         self.setup_logging()
-        self.camera = PiCamera()
+        try:
+            self.camera = PiCamera()
+        except Exception as ex:
+            self.logger.error( f"Failed to start Raspberry Pi Camera:\n{ex}" )
 
         server = socket.socket()
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
